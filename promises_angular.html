@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="App">
+<head>
+    <meta charset="UTF-8">
+    <title>Angular JS $q promises</title>
+</head>
+<body>
+<div ng-controller="mainController">Current Value: {{curValue}}<br> Step:{{step}}</div>
+<script src="http://code.angularjs.org/1.2.14/angular.min.js"></script>
+<script>
+    angular.module('App', []).
+            controller('mainController', ['$scope', '$q', function($scope, $q){
+                $scope.numIterator = function(num){
+                    var q = $q.defer();
+                    $scope.step++;
+                    if(angular.isNumber(num)){
+                        setTimeout(function(){
+                            q.resolve(num+1);
+                        }, 1000);
+
+                    }else{
+                        q.reject('NaN');
+                    }
+                    return q.promise;
+                }
+                $scope.step = 0;
+                $scope.curValue = 0;
+                $scope.promise = $scope.numIterator($scope.curValue);
+                $scope.promise
+                        .then(function(result){return $scope.numIterator(result)})
+                        .then(function(result){return $scope.numIterator(result)})
+                        .then(function(result){return $scope.numIterator(result)})
+                        .then(function(result){return $scope.numIterator(result)})
+                        .then(
+                        function(result){$scope.curValue = result},
+                        function(error){$scope.curValue = error}
+                );
+            }]);
+</script>
+
+</body>
+</html>
